@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>LINE User Info</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+  <h2>ข้อมูลผู้ใช้งาน LINE</h2>
+  <div id="profile" style="display:none;">
+    <img id="pictureUrl" width="120" />
+    <p><strong>ชื่อ:</strong> <span id="displayName"></span></p>
+    <p><strong>User ID:</strong> <span id="userId"></span></p>
+    <p style="color: green;">✅ บันทึกข้อมูลสำเร็จ</p>
+  </div>
+
+  <script>
+    const GAS_URL = "PASTE_YOUR_SCRIPT_URL_HERE"; // 👉 เปลี่ยนเป็น Web App URL ของคุณ
+
+    async function main() {
+      await liff.init({ liffId: "2007711340-AeDL9yX7" });
+
+      if (!liff.isLoggedIn()) {
+        liff.login();
+        return;
+      }
+
+      const profile = await liff.getProfile();
+      document.getElementById("pictureUrl").src = profile.pictureUrl;
+      document.getElementById("displayName").textContent = profile.displayName;
+      document.getElementById("userId").textContent = profile.userId;
+      document.getElementById("profile").style.display = 'block';
+
+      // ส่งข้อมูลไป Google Sheet
+      fetch(GAS_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId: profile.userId,
+          displayName: profile.displayName,
+          pictureUrl: profile.pictureUrl
+        })
+      });
+    }
+
+    main();
+  </script>
+</body>
+</html>
